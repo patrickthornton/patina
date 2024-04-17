@@ -37,10 +37,10 @@
         </div>
     </div>
 
-    <div class="slider">
+    <div class="slider" style="background-color: {colorFromHue(starting_hue)};">
         <input type="range" min="0" max="360" bind:value={starting_hue} />
 
-        {starting_hue}
+        current hue: {starting_hue}
     </div>
 
     <div class="title">
@@ -86,6 +86,9 @@
         position: fixed;
         right: 13%;
         top: 50%;
+        color: white;
+        border-radius: 0.5rem;
+        padding: 1rem;
     }
 
     .title {
