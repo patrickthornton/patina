@@ -1,16 +1,16 @@
 <script lang="ts">
-    import posts_array from "../assets/posts.json";
     import Timeline from "$lib/timeline.svelte";
     import Slider from "$lib/slider.svelte";
     import Title from "$lib/title.svelte";
+    import { colorFromHue } from "$lib/hue.svelte";
+    export let data: any;
 
-    let posts = posts_array;
-
+    let posts = data.posts;
     let starting_hue = 0;
 
     $: {
         posts.sort(
-            (a, b) =>
+            (a: any, b: any) =>
                 ((a.hue + starting_hue) % 360) - ((b.hue + starting_hue) % 360),
         );
         posts = posts;
@@ -19,6 +19,13 @@
 
 <body>
     <div class="page">
+        <div
+            class="author-header"
+            style="background-color: {colorFromHue(360 - starting_hue)};"
+        >
+            <h2>{data.author}</h2>
+        </div>
+
         <Timeline {posts} />
     </div>
 
@@ -43,5 +50,12 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
+    }
+
+    .author-header {
+        font-family: Spectral, serif;
+        width: 45%;
+        font-weight: bold;
+        text-align: center;
     }
 </style>
