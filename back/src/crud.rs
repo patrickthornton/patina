@@ -75,9 +75,14 @@ async fn post_post(mut db: Connection<Db>, mut post: Json<Post>) -> Result<Creat
         .expect("system time should be after epoch")
         .as_secs() as i64;
 
+    let user_id = sqlx::query!("SELECT user_id FROM users WHERE name = ?", post.author)
+        .fetch_one(&mut **db)
+        .map_ok(|r| r.user_id)
+        .await?;
+
     let results = sqlx::query!(
         "INSERT INTO posts (author, text, hue, reply_to, timestamp) VALUES (?, ?, ?, ?, ?) RETURNING post_id",
-        post.author,
+        user_id,
         post.text,
         post.hue,
         post.reply_to,
@@ -131,40 +136,6 @@ async fn get_name_from_user(mut db: Connection<Db>, id: i64) -> Result<Json<Stri
         .await?;
 
     Ok(Json(name))
-}
-
-// #[get("/get/text/from/post/<id>")]
-// async fn get_text_from_post(mut db: Connection<Db>, id: i64) -> Result<Json<Post>> {
-//     let post = sqlx::query!("SELECT * FROM posts WHERE id = ?", id)
-//         .fetch_one(&mut **db)
-//         .map_ok(|r| Post {
-//             id: r.id,
-//             author: r.author,
-//             text: r.text,
-//             hue: r.hue,
-//             reply_to: r.reply_to,
-//             likes: r.likes,
-//             timestamp: r.timestamp,
-//         })
-//         .await?;
-
-//     Ok(Json(post))
-// }
-
-#[get("/get/posts/from/user/<id>")]
-async fn get_posts_from_user(mut db: Connection<Db>, id: i64) -> Result<Json<Vec<i64>>> {
-    let id = sqlx::query!("SELECT user_id FROM users WHERE user_id = ?", id)
-        .fetch_one(&mut **db)
-        .map_ok(|r| r.user_id)
-        .await?;
-
-    let posts = sqlx::query!("SELECT * FROM posts WHERE author = ?", id)
-        .fetch(&mut **db)
-        .map_ok(|r| r.post_id)
-        .try_collect::<Vec<_>>()
-        .await?;
-
-    Ok(Json(posts))
 }
 
 #[get("/get/followers/from/user/<id>")]
@@ -255,7 +226,10 @@ async fn get_replies_from_post(mut db: Connection<Db>, id: i64) -> Result<Json<V
 #[get("/gradient/<time>")]
 async fn gradient(mut db: Connection<Db>, time: i64) -> Result<Json<Vec<Post>>> {
     let posts = sqlx::query!(
-        "SELECT * FROM posts JOIN users ON users.user_id = posts.author WHERE ? - posts.timestamp < ? ORDER BY posts.hue",
+        "SELECT * FROM posts
+        JOIN users ON users.user_id = posts.author
+        WHERE ? - posts.timestamp < ?
+        ORDER BY posts.hue",
         time,
         GRADIENT_DAILY_SPAN
     )
@@ -278,19 +252,28 @@ async fn gradient(mut db: Connection<Db>, time: i64) -> Result<Json<Vec<Post>>> 
 // returns all posts from a given user, sorted by time
 #[get("/user/<name>")]
 async fn user(mut db: Connection<Db>, name: &str) -> Result<Json<Vec<Post>>> {
-    let posts = sqlx::query!("SELECT * FROM posts JOIN users ON users.user_id = posts.author WHERE author = (SELECT users.user_id FROM users WHERE users.name = ?) ORDER BY timestamp DESC", name)
-        .fetch(&mut **db)
-        .map_ok(|r| Post {
-            post_id: r.post_id,
-            author: r.name,
-            text: r.text,
-            hue: r.hue,
-            reply_to: r.reply_to,
-            likes: r.likes,
-            timestamp: r.timestamp,
-        })
-        .try_collect::<Vec<_>>()
-        .await?;
+    let posts = sqlx::query!(
+        "SELECT * FROM posts
+            JOIN users ON users.user_id = posts.author
+            WHERE author =
+            (
+                SELECT users.user_id FROM users
+                WHERE users.name = ?
+            ) ORDER BY timestamp DESC",
+        name
+    )
+    .fetch(&mut **db)
+    .map_ok(|r| Post {
+        post_id: r.post_id,
+        author: r.name,
+        text: r.text,
+        hue: r.hue,
+        reply_to: r.reply_to,
+        likes: r.likes,
+        timestamp: r.timestamp,
+    })
+    .try_collect::<Vec<_>>()
+    .await?;
 
     Ok(Json(posts))
 }
@@ -298,20 +281,28 @@ async fn user(mut db: Connection<Db>, name: &str) -> Result<Json<Vec<Post>>> {
 // returns all liked posts by a given user, sorted by time
 #[get("/user/<name>/liked")]
 async fn liked(mut db: Connection<Db>, name: &str) -> Result<Json<Vec<Post>>> {
-    let posts = sqlx::query!("SELECT posts.*, users.name FROM posts JOIN users ON users.user_id = posts.author WHERE post_id IN (
-                              SELECT post FROM likes WHERE user = ?)ORDER BY timestamp DESC", name)
-        .fetch(&mut **db)
-        .map_ok(|r| Post {
-            post_id: r.post_id,
-            author: r.name,
-            text: r.text,
-            hue: r.hue,
-            reply_to: r.reply_to,
-            likes: r.likes,
-            timestamp: r.timestamp,
-        })
-        .try_collect::<Vec<_>>()
-        .await?;
+    let posts = sqlx::query!(
+        "SELECT posts.*, users.name FROM posts
+        JOIN users ON users.user_id = posts.author
+        WHERE post_id IN
+        (
+            SELECT post FROM likes
+            WHERE user = ?
+        ) ORDER BY timestamp DESC",
+        name
+    )
+    .fetch(&mut **db)
+    .map_ok(|r| Post {
+        post_id: r.post_id,
+        author: r.name,
+        text: r.text,
+        hue: r.hue,
+        reply_to: r.reply_to,
+        likes: r.likes,
+        timestamp: r.timestamp,
+    })
+    .try_collect::<Vec<_>>()
+    .await?;
 
     Ok(Json(posts))
 }
@@ -345,7 +336,6 @@ pub fn stage() -> AdHoc {
                     post_follow,
                     post_like,
                     get_name_from_user,
-                    get_posts_from_user,
                     get_followers_from_user,
                     get_followees_from_user,
                     get_likes_from_user,
@@ -354,6 +344,7 @@ pub fn stage() -> AdHoc {
                     search,
                     gradient,
                     user,
+                    liked,
                 ],
             )
     })

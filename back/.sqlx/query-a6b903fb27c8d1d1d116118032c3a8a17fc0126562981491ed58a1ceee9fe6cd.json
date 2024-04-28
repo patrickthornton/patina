@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT post_id FROM posts WHERE post_id = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "post_id",
+        "ordinal": 0,
+        "type_info": "Int64"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "a6b903fb27c8d1d1d116118032c3a8a17fc0126562981491ed58a1ceee9fe6cd"
+}

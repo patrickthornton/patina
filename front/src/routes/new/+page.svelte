@@ -7,14 +7,14 @@
 
     let newpost: Post;
     async function newPost() {
-        let author: string = "me";
+        let author: string = "shodslip";
         let text: string = posttxt;
         let hue: number = posthue;
 
         await fetch("http://127.0.0.1:8000/post/post", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
+                "Content-Type": "text/plain",
             },
             body: JSON.stringify({ author, text, hue }),
         }).catch((err) => console.error(err));

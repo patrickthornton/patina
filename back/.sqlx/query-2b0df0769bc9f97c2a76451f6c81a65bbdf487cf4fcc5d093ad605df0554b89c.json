@@ -1,10 +1,10 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT id FROM users WHERE id = ?",
+  "query": "INSERT INTO users (name) VALUES (?) RETURNING user_id",
   "describe": {
     "columns": [
       {
-        "name": "id",
+        "name": "user_id",
         "ordinal": 0,
         "type_info": "Int64"
       }
@@ -16,5 +16,5 @@
       false
     ]
   },
-  "hash": "7750f6ddb495fe929c5f009f3d80863ddf4d922035c6c87a23b22d3f48704028"
+  "hash": "2b0df0769bc9f97c2a76451f6c81a65bbdf487cf4fcc5d093ad605df0554b89c"
 }

@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO posts (author, text, hue, reply_to, timestamp) VALUES (?, ?, ?, ?, ?) RETURNING post_id",
+  "describe": {
+    "columns": [
+      {
+        "name": "post_id",
+        "ordinal": 0,
+        "type_info": "Int64"
+      }
+    ],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "89f1761d861c993a8bc03bd4e727120131ea32c0d175d0542ba2a1c5ab6c178f"
+}

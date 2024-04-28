@@ -1,10 +1,10 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT id FROM posts WHERE id = ?",
+  "query": "SELECT post_id FROM posts WHERE reply_to = ?",
   "describe": {
     "columns": [
       {
-        "name": "id",
+        "name": "post_id",
         "ordinal": 0,
         "type_info": "Int64"
       }
@@ -16,5 +16,5 @@
       false
     ]
   },
-  "hash": "a6247eb181cd5f31454a07be29c7e902b7a9ec76b3cc2cb4466e74b6561cfc37"
+  "hash": "0bd239ef2dcb8b498290fbad94efd3fbb3117a0f1ea175905dc6716f31c8f669"
 }
