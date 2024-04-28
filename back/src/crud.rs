@@ -274,7 +274,7 @@ async fn gradient(mut db: Connection<Db>, time: i64) -> Result<Json<Vec<Post>>> 
 
     Ok(Json(posts))
 }
-h
+
 // returns all posts from a given user, sorted by time
 #[get("/user/<id>")]
 async fn user(mut db: Connection<Db>, id: i64) -> Result<Json<Vec<Post>>> {
