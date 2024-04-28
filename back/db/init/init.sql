@@ -1,10 +1,11 @@
 create table posts (
     id integer not null primary key AUTOINCREMENT,
     author int not null references users(id),
-    reply_to int references posts(id),
     text text not null,
+    hue int not null,
+    reply_to int references posts(id),
     likes int not null default 0,
-    timestamp int not null default 0
+    timestamp int not null default 1714268741
 );
 
 create table users (

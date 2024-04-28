@@ -8,6 +8,9 @@ use futures::{future::TryFutureExt, stream::TryStreamExt};
 
 use rocket_db_pools::{sqlx, Connection, Database};
 
+// number of seconds in 36 hours
+const GRADIENT_DAILY_SPAN: i64 = 60 * 60 * 36;
+
 #[derive(Database)]
 #[database("patina")]
 struct Db(sqlx::SqlitePool);
@@ -20,8 +23,9 @@ struct Post {
     #[serde(skip_deserializing)]
     id: i64,
     author: i64,
-    reply_to: Option<i64>,
     text: String,
+    hue: i64,
+    reply_to: Option<i64>,
     #[serde(skip_deserializing)]
     likes: i64,
     #[serde(skip_deserializing)]
@@ -66,11 +70,16 @@ async fn post_user(mut db: Connection<Db>, mut user: Json<User>) -> Result<Creat
 
 #[post("/post/post", data = "<post>")]
 async fn post_post(mut db: Connection<Db>, mut post: Json<Post>) -> Result<Created<Json<Post>>> {
-    let epoch_time = SystemTime::now().duration_since(UNIX_EPOCH).expect("system time should be after epoch").as_secs() as i64;
+    let epoch_time = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .expect("system time should be after epoch")
+        .as_secs() as i64;
+
     let results = sqlx::query!(
-        "INSERT INTO posts (author, text, reply_to, timestamp) VALUES (?, ?, ?, ?) RETURNING id",
+        "INSERT INTO posts (author, text, hue, reply_to, timestamp) VALUES (?, ?, ?, ?, ?) RETURNING id",
         post.author,
         post.text,
+        post.hue,
         post.reply_to,
         epoch_time,
     )
@@ -131,8 +140,9 @@ async fn get_text_from_post(mut db: Connection<Db>, id: i64) -> Result<Json<Post
         .map_ok(|r| Post {
             id: r.id,
             author: r.author,
-            reply_to: r.reply_to,
             text: r.text,
+            hue: r.hue,
+            reply_to: r.reply_to,
             likes: r.likes,
             timestamp: r.timestamp,
         })
@@ -237,11 +247,60 @@ async fn get_replies_from_post(mut db: Connection<Db>, id: i64) -> Result<Json<V
     Ok(Json(likes))
 }
 
+// higher level API functions; called by each page
 
+// returns all posts within the last GRADIENT_DAILY_SPAN seconds of <time>,
+// sorted into a gradient;
+// to be enhanced with some kind of rec algo
+#[get("/gradient/<time>")]
+async fn gradient(mut db: Connection<Db>, time: i64) -> Result<Json<Vec<Post>>> {
+    let posts = sqlx::query!(
+        "SELECT * FROM posts WHERE ? - timestamp < ? ORDER BY hue",
+        time,
+        GRADIENT_DAILY_SPAN
+    )
+    .fetch(&mut **db)
+    .map_ok(|r| Post {
+        id: r.id,
+        author: r.author,
+        text: r.text,
+        hue: r.hue,
+        reply_to: r.reply_to,
+        likes: r.likes,
+        timestamp: r.timestamp,
+    })
+    .try_collect::<Vec<_>>()
+    .await?;
+
+    Ok(Json(posts))
+}
+h
+// returns all posts from a given user, sorted by time
+#[get("/user/<id>")]
+async fn user(mut db: Connection<Db>, id: i64) -> Result<Json<Vec<Post>>> {
+    let posts = sqlx::query!("SELECT * FROM posts WHERE author = (SELECT id FROM users WHERE id = ?) ORDER BY timestamp DESC", id)
+        .fetch(&mut **db)
+        .map_ok(|r| Post {
+            id: r.id,
+            author: r.author,
+            text: r.text,
+            hue: r.hue,
+            reply_to: r.reply_to,
+            likes: r.likes,
+            timestamp: r.timestamp,
+        })
+        .try_collect::<Vec<_>>()
+        .await?;
+
+    Ok(Json(posts))
+}
+
+
+// implements a search
 #[get("/search/<search>")]
 async fn search(mut db: Connection<Db>, search: &str) -> Result<Json<Vec<i64>>> {
     let search_string = format!("%{}%", search);
-    let posts = sqlx::query!("SELECT * FROM posts WHERE text LIKE ?", search_string)
+    let posts = sqlx::query!("SELECT * FROM posts WHERE text LIKE ? ORDER BY hue", search_string)
         .fetch(&mut **db)
         .map_ok(|r| r.id)
         .try_collect::<Vec<_>>()
@@ -271,6 +330,8 @@ pub fn stage() -> AdHoc {
                     get_likes_from_post,
                     get_replies_from_post,
                     search,
+                    gradient,
+                    user,
                 ],
             )
     })
