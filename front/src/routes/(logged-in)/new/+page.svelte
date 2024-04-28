@@ -1,13 +1,15 @@
 <script lang="ts">
     import Post from "$lib/interfaces.svelte";
     import { colorFromHue } from "$lib/hue.svelte";
+    import { user_name } from "../../../stores/user.js";
+    import { goto } from "$app/navigation";
 
     let posttxt = "";
     let posthue: number;
 
     let newpost: Post;
     async function newPost() {
-        let author: string = "shodslip";
+        let author: string = $user_name;
         let text: string = posttxt;
         let hue: number = posthue;
 
@@ -21,6 +23,7 @@
 
         // reset the input after adding a post
         posttxt = "";
+        goto("/");
     }
 </script>
 
@@ -32,7 +35,6 @@
 
 <h1>new post</h1>
 <input bind:value={posttxt} placeholder="new post" />
-<!-- <input bind:value={posthue} placeholder="choose color" /> -->
 <button on:click={newPost}>Add Post</button>
 
 <style>

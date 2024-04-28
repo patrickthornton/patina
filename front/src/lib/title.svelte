@@ -7,7 +7,6 @@
         position: fixed;
         right: 2%;
         top: 1.7%;
-        font-family: "Spectral", serif;
     }
 
     .title-text {

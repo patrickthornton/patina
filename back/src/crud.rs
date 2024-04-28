@@ -128,14 +128,14 @@ async fn post_like(mut db: Connection<Db>, like: Json<Like>) -> Result<Created<J
     Ok(Created::new("/post/like").body(like))
 }
 
-#[get("/get/name/from/user/<id>")]
-async fn get_name_from_user(mut db: Connection<Db>, id: i64) -> Result<Json<String>> {
-    let name = sqlx::query!("SELECT name FROM users WHERE user_id = ?", id)
+#[get("/get/user/from/name/<name>")]
+async fn get_user_from_name(mut db: Connection<Db>, name: &str) -> Result<Json<i64>> {
+    let user_id = sqlx::query!("SELECT user_id FROM users WHERE name = ?", name)
         .fetch_one(&mut **db)
-        .map_ok(|r| r.name)
+        .map_ok(|r| r.user_id)
         .await?;
 
-    Ok(Json(name))
+    Ok(Json(user_id))
 }
 
 #[get("/get/followers/from/user/<id>")]
@@ -335,7 +335,7 @@ pub fn stage() -> AdHoc {
                     post_post,
                     post_follow,
                     post_like,
-                    get_name_from_user,
+                    get_user_from_name,
                     get_followers_from_user,
                     get_followees_from_user,
                     get_likes_from_user,
