@@ -1,30 +1,25 @@
 <script lang="ts">
-    let posttxt = "";
-    import { posts } from "../../stores/posts.js";
+    import Post from "$lib/interfaces.svelte";
     import { colorFromHue } from "$lib/hue.svelte";
-    interface Post {
-        id: number;
-        author: string;
-        text: string;
-        hue: number;
-    }
+
+    let posttxt = "";
     let posthue: number;
 
     let newpost: Post;
-    function addNewPost() {
-        const newPost: Post = {
-            id: (Math.random() * 500) | 50,
-            author: "me",
-            text: posttxt,
-            hue: posthue,
-        };
+    async function newPost() {
+        let author: string = "me";
+        let text: string = posttxt;
+        let hue: number = posthue;
 
-        posts.update((allPosts) => {
-            allPosts.push(newPost);
-            return allPosts;
-        });
+        await fetch("http://127.0.0.1:8000/post/post", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ author, text, hue }),
+        }).catch((err) => console.error(err));
 
-        // Reset the input after adding a post
+        // reset the input after adding a post
         posttxt = "";
     }
 </script>
@@ -37,8 +32,8 @@
 
 <h1>new post</h1>
 <input bind:value={posttxt} placeholder="new post" />
-<input bind:value={posthue} placeholder="choose color" />
-<button on:click={addNewPost}>Add Post</button>
+<!-- <input bind:value={posthue} placeholder="choose color" /> -->
+<button on:click={newPost}>Add Post</button>
 
 <style>
     .slider {

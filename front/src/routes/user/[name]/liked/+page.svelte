@@ -7,15 +7,15 @@
     import { colorFromHue } from "$lib/hue.svelte";
 
     export let data;
-    let author: number = Number(data.id);
+    let author: number = data.name;
 
     let posts: Post[] = [];
     let starting_hue = 0;
     let current_time = Math.floor(new Date().getTime() / 1000);
 
     onMount(async () => {
-        posts = await fetch(`http://127.0.0.1:8000/user/${author}`).then((r) =>
-            r.json(),
+        posts = await fetch(`http://127.0.0.1:8000/user/${author}/liked`).then(
+            (r) => r.json(),
         );
     });
 </script>

@@ -1,6 +1,6 @@
 <script context="module" lang="ts">
     export interface Post {
-        id: number;
+        post_id: number;
         author: string;
         text: string;
         hue: number;
