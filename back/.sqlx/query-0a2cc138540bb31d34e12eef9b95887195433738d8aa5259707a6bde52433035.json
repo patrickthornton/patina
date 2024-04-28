@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT * FROM posts JOIN users ON users.user_id = posts.author WHERE ? - posts.timestamp < ? ORDER BY posts.hue",
+  "query": "SELECT * FROM posts\n            JOIN users ON users.user_id = posts.author\n            WHERE author =\n            (\n                SELECT users.user_id FROM users\n                WHERE users.name = ?\n            ) ORDER BY timestamp DESC",
   "describe": {
     "columns": [
       {
@@ -50,7 +50,7 @@
       }
     ],
     "parameters": {
-      "Right": 2
+      "Right": 1
     },
     "nullable": [
       false,
@@ -64,5 +64,5 @@
       false
     ]
   },
-  "hash": "fc1f9f79b7a7745c7bf59cf5ddbed8161220fa0ec5ee15952572669f409a8215"
+  "hash": "0a2cc138540bb31d34e12eef9b95887195433738d8aa5259707a6bde52433035"
 }

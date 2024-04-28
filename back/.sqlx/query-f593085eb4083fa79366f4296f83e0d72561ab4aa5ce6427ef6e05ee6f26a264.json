@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT * FROM posts JOIN users ON users.user_id = posts.author WHERE author = (SELECT users.user_id FROM users WHERE users.name = ?) ORDER BY timestamp DESC",
+  "query": "SELECT posts.*, users.name FROM posts\n        JOIN users ON users.user_id = posts.author\n        WHERE post_id IN\n        (\n            SELECT post FROM likes\n            WHERE user = ?\n        ) ORDER BY timestamp DESC",
   "describe": {
     "columns": [
       {
@@ -39,13 +39,8 @@
         "type_info": "Int64"
       },
       {
-        "name": "user_id",
-        "ordinal": 7,
-        "type_info": "Int64"
-      },
-      {
         "name": "name",
-        "ordinal": 8,
+        "ordinal": 7,
         "type_info": "Text"
       }
     ],
@@ -60,9 +55,8 @@
       true,
       false,
       false,
-      false,
       false
     ]
   },
-  "hash": "ba422a2a3495261f98571da84ca6bb2fff91cf3fb86ef5b9d6e59954af35a9ff"
+  "hash": "f593085eb4083fa79366f4296f83e0d72561ab4aa5ce6427ef6e05ee6f26a264"
 }
