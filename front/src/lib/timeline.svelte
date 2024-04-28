@@ -3,6 +3,25 @@
     import Post from "$lib/post.svelte";
 
     export let posts: any;
+
+    //here starts the color nonsense
+    var current_time = Math.floor(new Date().getTime() / 1000);
+    setInterval(() => {
+        current_time = Math.floor(new Date().getTime() / 1000);
+    }, 200);
+
+    $: starting_hue = timehue(current_time);
+    $: {
+        posts.sort(
+            (a, b) =>
+                ((a.hue + starting_hue) % 360) - ((b.hue + starting_hue) % 360),
+        );
+        posts = posts;
+    }
+
+    function timehue(now: number) {
+        return 360 - (now % 360);
+    }
 </script>
 
 <div class="timeline">

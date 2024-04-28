@@ -1,6 +1,6 @@
 <script lang="ts">
     let liked = false;
-    let user = 0; //until we figure out login
+    let user = 1; //until we figure out login
     export let post: number;
 
     async function like() {

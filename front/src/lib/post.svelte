@@ -1,26 +1,16 @@
 <script lang="ts">
     import { colorFromHue } from "./hue.svelte";
+    import Post from "./interfaces.svelte";
     import Like from "./like.svelte";
-    interface Post {
-        id: number;
-        author: string;
-        text: string;
-        hue: number;
-    }
 
-    let liked = false;
     export let post: Post;
-
-    function like() {
-        liked = !liked;
-    }
 </script>
 
 <div class="post" style="background-color: {colorFromHue(post.hue)};">
     <div class="content">
         <a href="/user/{post.author}" class="author">{post.author}</a>
         <p class="text">{post.text}</p>
-        <Like post={post.id} />
+        <Like post={post.post_id} />
     </div>
 </div>
 
@@ -50,10 +40,8 @@
         font-family: "Spectral", serif;
         text-decoration: none;
     }
-
     .text {
         color: white;
-
         font-size: 1.5rem;
         font-family: "Spectral", serif;
         font-weight: 300;

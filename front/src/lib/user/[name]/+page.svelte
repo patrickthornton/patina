@@ -1,8 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import Timeline from "$lib/timeline.svelte";
-    import Slider from "$lib/slider.svelte";
-    import Title from "$lib/title.svelte";
     import Post from "$lib/interfaces.svelte";
     import { colorFromHue } from "$lib/hue.svelte";
 
@@ -14,8 +12,8 @@
     let current_time = Math.floor(new Date().getTime() / 1000);
 
     onMount(async () => {
-        posts = await fetch(`http://127.0.0.1:8000/user/${author}/liked`).then(
-            (r) => r.json(),
+        posts = await fetch(`http://127.0.0.1:8000/user/${author}`).then((r) =>
+            r.json(),
         );
     });
 </script>
@@ -31,10 +29,6 @@
 
         <Timeline {posts} />
     </div>
-
-    <Slider bind:starting_hue />
-
-    <Title />
 </body>
 
 <style>
