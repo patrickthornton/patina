@@ -1,6 +1,6 @@
 <script lang="ts">
     import { colorFromHue } from "./hue.svelte";
-
+    import Like from "./like.svelte";
     interface Post {
         id: number;
         author: string;
@@ -16,15 +16,12 @@
     }
 </script>
 
-<div
-    class="post"
-    style="
-    background-color: {colorFromHue(post.hue)};
-    "
->
-    <a href="/user/{post.author}" class="author">{post.author}</a>
-    <p class="text">{post.text}</p>
-    <div class="like" on:click={like}>{liked ? "\u2619" : "\u2763"}</div>
+<div class="post" style="background-color: {colorFromHue(post.hue)};">
+    <div class="content">
+        <a href="/user/{post.author}" class="author">{post.author}</a>
+        <p class="text">{post.text}</p>
+        <Like post={post.id} />
+    </div>
 </div>
 
 <style>
@@ -34,12 +31,18 @@
         display: flex;
         flex-direction: column;
         justify-content: space-around;
+        align-items: center;
         padding-left: 1rem;
         padding-right: 1rem;
         padding-top: 0.5rem;
         padding-bottom: 0.2rem;
     }
-
+    .content {
+        width: 45%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
     .author {
         color: #eee;
         font-weight: bold;
@@ -50,15 +53,10 @@
 
     .text {
         color: white;
+
         font-size: 1.5rem;
         font-family: "Spectral", serif;
         font-weight: 300;
         line-height: 1.3;
-    }
-
-    .like {
-        padding: none;
-        align-self: flex-end;
-        font-size: 20pt;
     }
 </style>

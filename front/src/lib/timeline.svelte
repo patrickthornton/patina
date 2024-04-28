@@ -7,9 +7,6 @@
 
 <div class="timeline">
     {#each posts as post, i}
-        <div class="post">
-            <Post {post} />
-        </div>
         {#if i < posts.length - 1}
             <div
                 class="gradient"
@@ -19,13 +16,16 @@
                 )}, {colorFromHue(posts[i + 1].hue)});
             "
             ></div>
+            <div class="post">
+                <Post {post} />
+            </div>
         {/if}
     {/each}
 </div>
 
 <style>
     .timeline {
-        width: 45%;
+        width: 100%;
         display: flex;
         flex-direction: column;
     }
@@ -35,4 +35,9 @@
         margin: none;
         padding: none;
     }
+    /* .post {
+        width: 45%;
+        display: flex;
+        flex-direction: column;
+    } */
 </style>
