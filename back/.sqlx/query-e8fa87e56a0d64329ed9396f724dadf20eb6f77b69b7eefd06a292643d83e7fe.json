@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT follower FROM followers WHERE followee = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "follower",
+        "ordinal": 0,
+        "type_info": "Int64"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "e8fa87e56a0d64329ed9396f724dadf20eb6f77b69b7eefd06a292643d83e7fe"
+}

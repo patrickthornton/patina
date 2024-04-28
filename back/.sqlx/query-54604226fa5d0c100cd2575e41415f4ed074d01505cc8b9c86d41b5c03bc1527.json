@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO followers (follower, followee) VALUES (?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "54604226fa5d0c100cd2575e41415f4ed074d01505cc8b9c86d41b5c03bc1527"
+}

@@ -1,0 +1,50 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT * FROM posts WHERE id = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Int64"
+      },
+      {
+        "name": "author",
+        "ordinal": 1,
+        "type_info": "Int64"
+      },
+      {
+        "name": "reply_to",
+        "ordinal": 2,
+        "type_info": "Int64"
+      },
+      {
+        "name": "text",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "likes",
+        "ordinal": 4,
+        "type_info": "Int64"
+      },
+      {
+        "name": "timestamp",
+        "ordinal": 5,
+        "type_info": "Int64"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "da280dfbdfe992918eb4f25ca61c08fc01474c3753a63e05b02051f5c066abc2"
+}
