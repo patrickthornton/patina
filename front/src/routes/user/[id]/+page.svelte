@@ -1,20 +1,23 @@
 <script lang="ts">
+    import { onMount } from "svelte";
     import Timeline from "$lib/timeline.svelte";
     import Slider from "$lib/slider.svelte";
     import Title from "$lib/title.svelte";
+    import Post from "$lib/interfaces.svelte";
     import { colorFromHue } from "$lib/hue.svelte";
-    export let data: any;
 
-    let posts = data.posts;
+    export let data;
+    let author: number = Number(data.id);
+
+    let posts: Post[] = [];
     let starting_hue = 0;
+    let current_time = Math.floor(new Date().getTime() / 1000);
 
-    $: {
-        posts.sort(
-            (a: any, b: any) =>
-                ((a.hue + starting_hue) % 360) - ((b.hue + starting_hue) % 360),
+    onMount(async () => {
+        posts = await fetch(`http://127.0.0.1:8000/user/${author}`).then((r) =>
+            r.json(),
         );
-        posts = posts;
-    }
+    });
 </script>
 
 <body>
@@ -23,7 +26,7 @@
             class="author-header"
             style="background-color: {colorFromHue(360 - starting_hue)};"
         >
-            <h2>{data.author}</h2>
+            <h2>{author}</h2>
         </div>
 
         <Timeline {posts} />
