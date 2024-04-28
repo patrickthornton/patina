@@ -15,10 +15,14 @@
             user_name.set("");
         }}
     >
-        {#if !isHovering}
-            {$user_name}
+        {#if $user_id != 0}
+            {#if !isHovering}
+                {$user_name}
+            {:else}
+                log out
+            {/if}
         {:else}
-            log out
+            log in
         {/if}
     </a>
 </div>
