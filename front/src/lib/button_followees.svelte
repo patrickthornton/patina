@@ -2,7 +2,7 @@
     export let author: string = "";
 </script>
 
-<a class="button enabled" href="/user/{author}/followees"> followees </a>
+<a class="button enabled" href="/user/{author}/followees"> follows </a>
 
 <style>
     @import "./button_style.css";
