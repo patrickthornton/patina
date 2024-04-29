@@ -1,7 +1,6 @@
 <script lang="ts">
     import { user_id } from "../stores/user.js";
     import { get } from "svelte/store";
-    export let author: string;
     export let following: boolean;
     export let followee: number;
 
