@@ -127,6 +127,11 @@ async fn delete_follow(mut db: Connection<Db>, follow: Json<Follow>) -> Result<(
     Ok(())
 }
 
+#[options("/delete/follow")]
+async fn delete_follow_preflight() -> Result<()> {
+    Ok(())
+}
+
 #[post("/post/like", data = "<like>")]
 async fn post_like(mut db: Connection<Db>, like: Json<Like>) -> Result<Created<Json<Like>>> {
     sqlx::query!(
@@ -230,6 +235,39 @@ async fn gradient(mut db: Connection<Db>, time: i64) -> Result<Json<Vec<Post>>> 
     Ok(Json(posts))
 }
 
+// returns all posts just by followers sorted by hue
+#[get("/following/<name>/<time>")]
+async fn following(mut db: Connection<Db>, name: &str, time: i64) -> Result<Json<Vec<Post>>> {
+    let posts = sqlx::query!(
+        "SELECT * FROM posts
+        JOIN users ON users.user_id = posts.author
+        JOIN followers ON followers.followee = posts.author
+        WHERE followers.follower =
+        (
+            SELECT users.user_id FROM users
+            WHERE users.name = ?
+        ) AND ? - posts.timestamp < ?
+        ORDER BY hue",
+        name,
+        time,
+        GRADIENT_DAILY_SPAN
+    )
+    .fetch(&mut **db)
+    .map_ok(|r| Post {
+        post_id: r.post_id,
+        author: r.name,
+        text: r.text,
+        hue: r.hue,
+        reply_to: r.reply_to,
+        likes: r.likes,
+        timestamp: r.timestamp,
+    })
+    .try_collect::<Vec<_>>()
+    .await?;
+
+    Ok(Json(posts))
+}
+
 // returns all posts from a given user, sorted by time
 #[get("/user/<name>")]
 async fn user(mut db: Connection<Db>, name: &str) -> Result<Json<Vec<Post>>> {
@@ -283,12 +321,12 @@ async fn check_follow(mut db: Connection<Db>, follower: &str, followee: &str) ->
 }
 
 // returns all followers of a given user
-#[get("/user/<name>/followers")]
-async fn followers(mut db: Connection<Db>, name: &str) -> Result<Json<Vec<User>>> {
-    let followers = sqlx::query!(
+#[get("/user/<name>/followees")]
+async fn followees(mut db: Connection<Db>, name: &str) -> Result<Json<Vec<User>>> {
+    let followees = sqlx::query!(
         "SELECT * FROM users
-        JOIN followers ON followers.follower = users.user_id
-        WHERE followee =
+        JOIN followers ON followers.followee = users.user_id
+        WHERE follower =
         (
             SELECT users.user_id FROM users
             WHERE users.name = ?
@@ -303,7 +341,7 @@ async fn followers(mut db: Connection<Db>, name: &str) -> Result<Json<Vec<User>>
     .try_collect::<Vec<_>>()
     .await?;
 
-    Ok(Json(followers))
+    Ok(Json(followees))
 }
 
 // returns all liked posts by a given user, sorted by time
@@ -363,6 +401,7 @@ pub fn stage() -> AdHoc {
                     post_post,
                     post_follow,
                     delete_follow,
+                    delete_follow_preflight,
                     post_like,
                     get_user_from_name,
                     get_likes_from_user,
@@ -370,9 +409,10 @@ pub fn stage() -> AdHoc {
                     get_replies_from_post,
                     search,
                     gradient,
+                    following,
                     user,
                     check_follow,
-                    followers,
+                    followees,
                     liked,
                 ],
             )

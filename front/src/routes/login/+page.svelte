@@ -2,6 +2,7 @@
     import { colorFromHue, now, hueFromTime } from "$lib/hue.svelte";
     import { user_id, user_name } from "../../stores/user.js";
     import { goto } from "$app/navigation";
+    import { browser } from "$app/environment";
 
     let time = now();
     setInterval(() => {
@@ -29,6 +30,9 @@
             .then((data) => {
                 user_id.set(data);
                 user_name.set(name);
+                if (browser) {
+                    document.cookie = `user_name=${name};path=/`;
+                }
                 goto("/");
             })
             .catch(async (err) => {
@@ -49,6 +53,9 @@
                     .then((data) => {
                         user_id.set(data.user_id);
                         user_name.set(data.name);
+                        if (browser) {
+                            document.cookie = `user_name=${name};path=/`;
+                        }
                         goto("/");
                     })
                     .catch((err) => {

@@ -8,4 +8,9 @@
         likes: number;
         timestamp: number;
     }
+
+    export interface User {
+        user_id: number;
+        name: string;
+    }
 </script>

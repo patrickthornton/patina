@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT * FROM users\n        JOIN followers ON followers.followee = users.user_id\n        WHERE follower =\n        (\n            SELECT users.user_id FROM users\n            WHERE users.name = ?\n        )",
+  "describe": {
+    "columns": [
+      {
+        "name": "user_id",
+        "ordinal": 0,
+        "type_info": "Int64"
+      },
+      {
+        "name": "name",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "follower",
+        "ordinal": 2,
+        "type_info": "Int64"
+      },
+      {
+        "name": "followee",
+        "ordinal": 3,
+        "type_info": "Int64"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "441d5974d3dbd0caa6504bbb27733194da228e08c2b7277820496484c4c07899"
+}

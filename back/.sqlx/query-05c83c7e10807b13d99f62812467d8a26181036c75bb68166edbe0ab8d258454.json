@@ -1,0 +1,80 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT * FROM posts\n        JOIN users ON users.user_id = posts.author\n        JOIN followers ON followers.followee = posts.author\n        WHERE followers.follower =\n        (\n            SELECT users.user_id FROM users\n            WHERE users.name = ?\n        ) AND ? - posts.timestamp < ?\n        ORDER BY hue",
+  "describe": {
+    "columns": [
+      {
+        "name": "post_id",
+        "ordinal": 0,
+        "type_info": "Int64"
+      },
+      {
+        "name": "author",
+        "ordinal": 1,
+        "type_info": "Int64"
+      },
+      {
+        "name": "text",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "hue",
+        "ordinal": 3,
+        "type_info": "Int64"
+      },
+      {
+        "name": "reply_to",
+        "ordinal": 4,
+        "type_info": "Int64"
+      },
+      {
+        "name": "likes",
+        "ordinal": 5,
+        "type_info": "Int64"
+      },
+      {
+        "name": "timestamp",
+        "ordinal": 6,
+        "type_info": "Int64"
+      },
+      {
+        "name": "user_id",
+        "ordinal": 7,
+        "type_info": "Int64"
+      },
+      {
+        "name": "name",
+        "ordinal": 8,
+        "type_info": "Text"
+      },
+      {
+        "name": "follower",
+        "ordinal": 9,
+        "type_info": "Int64"
+      },
+      {
+        "name": "followee",
+        "ordinal": 10,
+        "type_info": "Int64"
+      }
+    ],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "05c83c7e10807b13d99f62812467d8a26181036c75bb68166edbe0ab8d258454"
+}
