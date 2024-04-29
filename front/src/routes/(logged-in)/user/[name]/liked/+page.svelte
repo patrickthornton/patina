@@ -9,7 +9,6 @@
 
     let posts: Post[] = [];
     let starting_hue = 0;
-    let current_time = Math.floor(new Date().getTime() / 1000);
 
     onMount(async () => {
         posts = await fetch(`http://127.0.0.1:8000/user/${author}/liked`).then(

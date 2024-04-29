@@ -24,6 +24,7 @@ create unique index unique_follows on followers(follower, followee);
 create table likes (
     post int not null references posts(post_id),
     user int not null references users(user_id),
+    liked bool not null,
     primary key (post, user)
 );
 

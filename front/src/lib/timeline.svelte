@@ -9,7 +9,6 @@
     setInterval(() => {
         current_time = now();
     }, 200);
-
     $: starting_hue = hueFromTime(current_time);
     $: {
         posts.sort(

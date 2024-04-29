@@ -57,6 +57,7 @@
                             document.cookie = `user_name=${name};path=/`;
                         }
                         goto("/");
+                        console.log("user id" + data.user_id);
                     })
                     .catch((err) => {
                         console.error(err);

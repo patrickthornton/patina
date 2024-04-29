@@ -52,6 +52,7 @@ struct Follow {
 struct Like {
     post: i64,
     user: i64,
+    liked: bool,
 }
 
 #[post("/post/user", data = "<user>")]
@@ -134,15 +135,39 @@ async fn delete_follow_preflight() -> Result<()> {
 
 #[post("/post/like", data = "<like>")]
 async fn post_like(mut db: Connection<Db>, like: Json<Like>) -> Result<Created<Json<Like>>> {
-    sqlx::query!(
-        "INSERT INTO likes (post, user) VALUES (?, ?)",
+    //if post and user exists, then change the bool value
+    //if it doesn't:
+    let existing_like = sqlx::query!(
+        "SELECT liked FROM likes WHERE post = ? AND user = ?",
         like.post,
-        like.user,
+        like.user
     )
-    .fetch(&mut **db)
-    .try_collect::<Vec<_>>()
+    .fetch_optional(&mut **db)
     .await?;
 
+    match existing_like {
+        Some(_) => {
+            sqlx::query!(
+                "UPDATE likes SET liked = ? WHERE post = ? AND user = ?",
+                like.liked,
+                like.post,
+                like.user,
+            )
+            .execute(&mut **db)
+            .await?;
+        }
+        None => {
+            sqlx::query!(
+                "INSERT INTO likes (post, user, liked) VALUES (?, ?, ?)",
+                like.post,
+                like.user,
+                like.liked
+            )
+            .fetch(&mut **db)
+            .try_collect::<Vec<_>>()
+            .await?;
+        }
+    }
     Ok(Created::new("/post/like").body(like))
 }
 
@@ -347,6 +372,10 @@ async fn followees(mut db: Connection<Db>, name: &str) -> Result<Json<Vec<User>>
 // returns all liked posts by a given user, sorted by time
 #[get("/user/<name>/liked")]
 async fn liked(mut db: Connection<Db>, name: &str) -> Result<Json<Vec<Post>>> {
+    let id = sqlx::query!("SELECT user_id FROM users WHERE name = ?", name)
+        .fetch_one(&mut **db)
+        .await?;
+
     let posts = sqlx::query!(
         "SELECT posts.*, users.name FROM posts
         JOIN users ON users.user_id = posts.author
@@ -355,7 +384,7 @@ async fn liked(mut db: Connection<Db>, name: &str) -> Result<Json<Vec<Post>>> {
             SELECT post FROM likes
             WHERE user = ?
         ) ORDER BY timestamp DESC",
-        name
+        id.user_id
     )
     .fetch(&mut **db)
     .map_ok(|r| Post {

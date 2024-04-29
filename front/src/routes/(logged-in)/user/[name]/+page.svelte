@@ -1,10 +1,9 @@
 <script lang="ts">
-    import { onMount } from "svelte";
     import Timeline from "$lib/timeline.svelte";
     import FollowButton from "$lib/button_follow.svelte";
     import FolloweesButton from "$lib/button_followees.svelte";
     import Post from "$lib/interfaces.svelte";
-    import { colorFromHue } from "$lib/hue.svelte";
+    import { colorFromHue, now, hueFromTime } from "$lib/hue.svelte";
 
     export let data;
     let author: number = data.name;
