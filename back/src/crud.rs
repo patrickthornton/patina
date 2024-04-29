@@ -128,7 +128,7 @@ async fn post_like(mut db: Connection<Db>, like: Json<Like>) -> Result<Created<J
     .await?;
 
     match existing_like {
-        Some(existing_like) => {
+        Some(_) => {
             sqlx::query!(
                 "UPDATE likes SET liked = ? WHERE post = ? AND user = ?",
                 like.liked,

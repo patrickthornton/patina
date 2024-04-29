@@ -17,12 +17,20 @@
     }
 </script>
 
-<div class="like" on:click={like}>{liked ? "\u2764" : "\u2763"}</div>
+{#if $user_id != 0}
+    <button class="like" on:click={like}>{liked ? "\u2764" : "\u2763"}</button>
+{:else}
+    <button class="like">{"\u2766"}</button>
+{/if}
 
 <style>
     .like {
+        all: initial;
+        font: inherit;
+        color: inherit;
         padding: none;
         align-self: flex-end;
         font-size: 20pt;
+        background: none;
     }
 </style>
