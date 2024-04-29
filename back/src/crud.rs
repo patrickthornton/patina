@@ -52,6 +52,7 @@ struct Follow {
 struct Like {
     post: i64,
     user: i64,
+    liked: bool,
 }
 
 #[post("/post/user", data = "<user>")]
@@ -116,15 +117,39 @@ async fn post_follow(
 
 #[post("/post/like", data = "<like>")]
 async fn post_like(mut db: Connection<Db>, like: Json<Like>) -> Result<Created<Json<Like>>> {
-    sqlx::query!(
-        "INSERT INTO likes (post, user) VALUES (?, ?)",
+    //if post and user exists, then change the bool value
+    //if it doesn't:
+    let existing_like = sqlx::query!(
+        "SELECT liked FROM likes WHERE post = ? AND user = ?",
         like.post,
-        like.user,
+        like.user
     )
-    .fetch(&mut **db)
-    .try_collect::<Vec<_>>()
+    .fetch_optional(&mut **db)
     .await?;
 
+    match existing_like {
+        Some(existing_like) => {
+            sqlx::query!(
+                "UPDATE likes SET liked = ? WHERE post = ? AND user = ?",
+                like.liked,
+                like.post,
+                like.user,
+            )
+            .execute(&mut **db)
+            .await?;
+        }
+        None => {
+            sqlx::query!(
+                "INSERT INTO likes (post, user, liked) VALUES (?, ?, ?)",
+                like.post,
+                like.user,
+                like.liked
+            )
+            .fetch(&mut **db)
+            .try_collect::<Vec<_>>()
+            .await?;
+        }
+    }
     Ok(Created::new("/post/like").body(like))
 }
 
