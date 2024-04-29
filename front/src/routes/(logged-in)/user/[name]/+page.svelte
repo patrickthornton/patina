@@ -6,16 +6,9 @@
 
     export let data;
     let author: number = data.name;
+    let posts: Post[] = data.posts;
 
-    let posts: Post[] = [];
     let starting_hue = 0;
-
-    onMount(async () => {
-        posts = await fetch(`http://127.0.0.1:8000/user/${author}`).then((r) =>
-            r.json(),
-        );
-        console.log(posts);
-    });
 </script>
 
 <div

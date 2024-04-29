@@ -1,9 +1,10 @@
 import type { PageServerLoad } from "./$types";
+import { now } from "$lib/hue.svelte";
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async () => {
+    let current_time = now();
     return {
-        name: params.name,
-        posts: await fetch(`http://127.0.0.1:8000/user/${params.name}`)
+        posts: await fetch(`http://127.0.0.1:8000/gradient/${current_time}`)
             .then((res) => {
                 if (!res.ok) {
                     throw new Error("HTTP error " + res.status);
