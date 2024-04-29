@@ -10,6 +10,7 @@
         class="user-text"
         on:mouseover={() => (isHovering = true)}
         on:mouseleave={() => (isHovering = false)}
+        on:focus={() => (isHovering = true)}
         on:click={() => {
             user_id.set(0);
             user_name.set("");

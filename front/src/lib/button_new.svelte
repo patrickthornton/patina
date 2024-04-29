@@ -5,7 +5,7 @@
 {#if $user_id != 0}
     <a class="button enabled" href="/new"> new </a>
 {:else}
-    <a class="button disabled"> log in! </a>
+    <div class="button disabled">log in!</div>
 {/if}
 
 <style>
