@@ -1,9 +1,11 @@
 <script lang="ts">
-    let liked = false;
-    let user = 1; //until we figure out login
+    import { user_id } from "../stores/user.js";
     export let post: number;
 
+    let liked = false;
+
     async function like() {
+        let user = $user_id;
         liked = !liked;
         await fetch("http://127.0.0.1:8000/post/like", {
             method: "POST",

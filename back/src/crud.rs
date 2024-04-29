@@ -306,6 +306,10 @@ async fn user(mut db: Connection<Db>, name: &str) -> Result<Json<Vec<Post>>> {
 // returns all liked posts by a given user, sorted by time
 #[get("/user/<name>/liked")]
 async fn liked(mut db: Connection<Db>, name: &str) -> Result<Json<Vec<Post>>> {
+    let id = sqlx::query!("SELECT user_id FROM users WHERE name = ?", name)
+        .fetch_one(&mut **db)
+        .await?;
+
     let posts = sqlx::query!(
         "SELECT posts.*, users.name FROM posts
         JOIN users ON users.user_id = posts.author
@@ -314,7 +318,7 @@ async fn liked(mut db: Connection<Db>, name: &str) -> Result<Json<Vec<Post>>> {
             SELECT post FROM likes
             WHERE user = ?
         ) ORDER BY timestamp DESC",
-        name
+        id.user_id
     )
     .fetch(&mut **db)
     .map_ok(|r| Post {

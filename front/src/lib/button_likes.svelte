@@ -1,8 +1,8 @@
 <script lang="ts">
-    export let user_name;
+    export let name: String;
 </script>
 
-<a class="button enabled" href="/user/{$user_name}/liked"> likes </a>
+<a class="button enabled" href="/user/{name}/liked"> likes </a>
 
 <style>
     @import "./button_style.css";

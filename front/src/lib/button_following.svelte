@@ -1,3 +1,7 @@
+<script lang="ts">
+    export let name;
+</script>
+
 <a class="button enabled" href="/"> following </a>
 
 <style>
