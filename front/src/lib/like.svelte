@@ -4,15 +4,14 @@
     export let post: number;
 
     async function like() {
+        liked = !liked;
         await fetch("http://127.0.0.1:8000/post/like", {
             method: "POST",
             headers: {
                 "Content-Type": "text/plain",
             },
-            body: JSON.stringify({ post, user }),
+            body: JSON.stringify({ post, user, liked }),
         }).catch((err) => console.error(err));
-
-        liked = !liked;
     }
 </script>
 

@@ -13,6 +13,7 @@
         let author: string = $user_name;
         let text: string = post_text;
         let hue: number = post_hue;
+        let reply_to = null;
 
         if (!text) {
             return;
@@ -23,7 +24,7 @@
             headers: {
                 "Content-Type": "text/plain",
             },
-            body: JSON.stringify({ author, text, hue }),
+            body: JSON.stringify({ author, text, hue, reply_to }),
         }).catch((err) => console.error(err));
 
         // reset the input after adding a post

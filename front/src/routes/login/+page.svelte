@@ -50,6 +50,7 @@
                         user_id.set(data.user_id);
                         user_name.set(data.name);
                         goto("/");
+                        console.log("user id" + data.user_id);
                     })
                     .catch((err) => {
                         console.error(err);
